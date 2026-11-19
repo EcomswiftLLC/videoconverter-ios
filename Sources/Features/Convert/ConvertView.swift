@@ -97,8 +97,10 @@ struct ConvertView: View {
     private var headerSubtitle: String? {
         if queue.hasFinished && queue.doneItems.count > 0 {
             let saved = savedBytes
-            if saved > 0 { return "You saved \(Fmt.bytes(saved)) compared with the originals." }
-            return "Save or share your converted files below."
+            let plural = queue.doneItems.count > 1
+            // Only claim a saving when it is worth saying; a re-wrapped file is the same size and the same quality.
+            if saved >= 100_000 { return plural ? "You saved \(Fmt.bytes(saved)) compared with the originals." : "You saved \(Fmt.bytes(saved)) compared with the original." }
+            return plural ? "Save or share your converted files below." : "Save or share your converted file below."
         }
         return nil
     }
