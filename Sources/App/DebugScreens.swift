@@ -112,3 +112,24 @@ private struct DebugHost: View {
     }
 }
 #endif
+
+#if DEBUG
+import UIKit
+
+/// CI only: with `-fxSnapshot <path>` the app writes a PNG of its own key window every two seconds.
+/// The simulator's screen capture of an app rotated to landscape comes out cropped and sideways, this does not.
+enum DebugSnapshot {
+    private static var timer: Timer?
+
+    static func startIfRequested() {
+        guard let path = UserDefaults.standard.string(forKey: "fxSnapshot"), !path.isEmpty, timer == nil else { return }
+        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
+            let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+            guard let window = scenes.flatMap({ $0.windows }).first(where: { $0.isKeyWindow }) ?? scenes.first?.windows.first else { return }
+            let renderer = UIGraphicsImageRenderer(bounds: window.bounds)
+            let image = renderer.image { _ in window.drawHierarchy(in: window.bounds, afterScreenUpdates: true) }
+            if let data = image.pngData() { try? data.write(to: URL(fileURLWithPath: path), options: .atomic) }
+        }
+    }
+}
+#endif

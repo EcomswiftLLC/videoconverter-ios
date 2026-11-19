@@ -52,6 +52,9 @@ struct RootView: View {
             #endif
         }
         .apScreen()
+        #if DEBUG
+        .onAppear { DebugSnapshot.startIfRequested() }
+        #endif
         .task(id: appState.hasOnboarded) { await startAdsWhenReady() }
         .onChange(of: ads.adsReady) { _, ready in
             if ready { RewardedGate.shared.preloadIfPossible() }
