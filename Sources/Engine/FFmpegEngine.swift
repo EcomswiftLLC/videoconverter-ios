@@ -22,7 +22,11 @@ final class FFmpegEngine: TranscodeEngine {
     /// FFmpeg's command-line core keeps global state, so only one command runs at a time.
     private static let runLock = NSLock()
 
-    init(bridge: FFmpegBridge) { self.bridge = bridge }
+    init(bridge: FFmpegBridge) {
+        self.bridge = bridge
+        // A format whose encoder is not in the linked library must not be offered as an output.
+        OutputFormat.unavailable = bridge.capabilities.encoders.contains("libtheora") || bridge.capabilities.encoders.isEmpty ? [] : [.ogv]
+    }
 
     var capabilities: FFmpegCapabilities { bridge.capabilities }
 

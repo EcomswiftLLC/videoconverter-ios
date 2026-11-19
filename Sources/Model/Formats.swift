@@ -326,8 +326,11 @@ enum OutputFormat: String, CaseIterable, Codable, Hashable, Identifiable {
         }
     }
 
+    /// Outputs the linked FFmpeg cannot write (set once at launch from its encoder list), hidden from every picker.
+    nonisolated(unsafe) static var unavailable: Set<OutputFormat> = []
+
     static func formats(in category: FormatCategory) -> [OutputFormat] {
-        allCases.filter { $0.category == category }
+        allCases.filter { $0.category == category && !unavailable.contains($0) }
     }
 }
 

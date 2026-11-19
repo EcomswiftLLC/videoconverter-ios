@@ -10,7 +10,7 @@ final class LGPLBridge: FFmpegBridge {
     init?() {
         guard fx_available() == 1 else { return nil }
         let wanted = ["h264_videotoolbox", "hevc_videotoolbox", "libvpx-vp9", "libvpx", "mpeg4", "mpeg2video", "wmv2", "flv", "mjpeg", "prores_ks",
-                      "h263", "aac", "libmp3lame", "libopus", "libvorbis", "flac", "ac3", "alac", "pcm_s16le", "pcm_s16be", "wmav2", "libwebp_anim", "apng", "gif"]
+                      "h263", "aac", "libmp3lame", "libopus", "libvorbis", "flac", "ac3", "alac", "pcm_s16le", "pcm_s16be", "wmav2", "libwebp_anim", "apng", "gif", "libtheora"]
         let found = Set(wanted.filter { fx_has_encoder($0) != 0 })
         capabilities = FFmpegCapabilities(hasZscale: fx_has_filter("zscale") != 0, encoders: found)
         cancelFlag = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
