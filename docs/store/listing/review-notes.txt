@@ -1,0 +1,17 @@
+Fluxa converts video and audio files between formats on the device. There is no account, no login and no demo credentials. Everything works on first launch.
+
+How to test:
+1. On Home, tap Choose a video and pick any video from Photos (or open a file from Files). On iPad you can also drag a file onto the drop zone.
+2. On the Convert screen, tap MP4 in the format grid (or a preset such as Universal MP4), then tap Convert. Progress is shown in the queue.
+3. When it finishes, tap Save or Share. The app offers one opt-in rewarded video ("Watch a short ad to export"). Watch it, or, if no ad is available, the export goes ahead for free.
+4. Other things to try: Audio > MP3 to extract the sound, GIF in the Animated image group, Advanced for codec, resolution and trim, and the Formats guide.
+
+Ads: the app is free and supported by Google AdMob. A banner appears on Home only. Before a save or share, the app offers one opt-in rewarded video; one watched ad covers that export (a whole batch counts as one) and further exports for 2 minutes. If no ad is available (offline, no fill, consent pending), the export goes ahead without one. There are no in-app purchases, no subscriptions and no watermark. A Google UMP consent form may appear first where required, followed by the App Tracking Transparency prompt; the app works the same whichever choice is made.
+
+Limits: DRM-protected files (for example films bought or rented from a store) and encrypted files cannot be converted. The app shows a clear message explaining this instead of failing silently.
+
+Permissions: Photos (the system photo picker for reading, add-only access to save results) and Tracking (App Tracking Transparency, for ads). The app does not use the camera, the microphone or location.
+
+Privacy: files are converted on the device and never uploaded. The only network traffic is the Google Mobile Ads SDK. Privacy policy: https://ecomswiftllc.github.io/fluxa/privacy/
+
+Open source: Fluxa uses the FFmpeg libraries under the LGPL 2.1 or later, linked as dynamic frameworks. Notices and the source offer are in Settings > Open-source licences and at https://ecomswiftllc.github.io/fluxa/licenses/

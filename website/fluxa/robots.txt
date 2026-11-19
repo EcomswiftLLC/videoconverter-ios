@@ -1,0 +1,5 @@
+# Hosted on GitHub Pages as a project path under /fluxa/.
+User-agent: *
+Allow: /
+
+Sitemap: https://ecomswiftllc.github.io/fluxa/sitemap.xml

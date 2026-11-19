@@ -1,0 +1,45 @@
+Convert any video or audio file into the format you need, right on your iPhone or iPad. Fluxa opens MKV, AVI, WebM, WMV, FLV, MOV and dozens more, and saves them as MP4, MOV, MKV, WebM, AVI, MP3, GIF and other formats. It is free, there is no account, and your files never leave your device.
+
+PICK A FORMAT, TAP CONVERT
+- Choose a video from Photos or Files, or drag it in on iPad
+- Pick the target from a clear grid grouped into Video, Audio and Animated image, or start from a preset
+- When the codecs already fit the new format, Fluxa just re-wraps the file: done in seconds, with no loss in quality
+- Your original file is never changed
+
+PRESETS FOR EVERY DEVICE
+Universal MP4, iPhone and iPad, Android, Web (WebM), Windows (WMV or AVI), Old TV and DVD player (MPG), Editing (ProRes MOV), GIF, Audio only, and Fix a video that will not play (re-made as H.264 and AAC in MP4).
+
+FULL CONTROL WHEN YOU WANT IT
+- Video codec: H.264 and HEVC with hardware encoding, VP9, VP8, MPEG-4, MPEG-2, WMV, Motion JPEG, ProRes and Theora, depending on the format
+- Resolution from 4K down to 360p or a custom size, frame rate, quality or bitrate
+- Audio codec, bitrate and sample rate
+- Trim, rotate and flip, keep or remove metadata, and convert HDR to standard colour
+
+EXTRACT AUDIO
+Save the sound of any video as MP3, M4A, WAV, FLAC, OGG, Opus, AIFF or AC3. Audio files can be converted between these formats too.
+
+GIFS AND ANIMATED IMAGES
+Turn a clip into a GIF with an optimised colour palette, or into animated WebP or APNG.
+
+BATCH CONVERT
+Add several files to the queue and convert them in one go, with progress for each file.
+
+WHAT IT READS
+Video: MP4, MOV, M4V, 3GP, 3G2, MKV, WebM, AVI (DivX and XviD), WMV, ASF, FLV, F4V, MPG, MPEG, VOB, TS, M2TS, MTS, MXF, OGV, RM, RMVB, DV, MJPEG, plus AV1, VP8 and VP9 video, GIF, animated WebP and APNG.
+Audio: MP3, AAC, M4A, WAV, AIFF, CAF, FLAC, OGG, Opus, WMA, AMR, AC3 and EAC3.
+
+WHAT IT WRITES
+Video: MP4, MOV, M4V, 3GP, MKV, WebM, AVI, FLV, WMV, MPG, MPEG-TS and OGV.
+Audio: M4A, MP3, WAV, AIFF, CAF, FLAC, OGG, Opus and AC3.
+Animated image: GIF, animated WebP and APNG.
+
+HONEST LIMITS
+Fluxa cannot convert DRM-protected files, such as films bought or rented from a store or downloaded from a streaming service, or encrypted files. Some very old or rare codecs may not open. HEVC hardware encoding needs a device that supports it. Fluxa tells you clearly when a file cannot be converted, and why.
+
+PRIVATE BY DESIGN
+Every file is converted on your device with Apple's media frameworks and the open-source FFmpeg libraries. Nothing is uploaded, there is no account, and we run no analytics of our own.
+
+FREE, WITH ADS
+Fluxa is free, with no subscription, no in-app purchase and no watermark. Ads from Google AdMob pay for it: a banner on the Home screen and, before you save or share, one short video that you choose to watch. One watched ad covers the whole export, even a batch, and further exports for 2 minutes. If no ad is available, your export goes ahead anyway. If you allow tracking when iOS asks, ads may use your advertising identifier. The app works the same either way.
+
+Questions or ideas? Write to support@ecomswiftllc.com.
