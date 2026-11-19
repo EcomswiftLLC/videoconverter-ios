@@ -87,17 +87,30 @@ enum TestClips {
         let totalSamples = Int(seconds * Double(rate))
         var audioWritten = 0
 
-        func waitReady(_ input: AVAssetWriterInput) async throws {
-            var waited = 0
-            while !input.isReadyForMoreMediaData {
-                try await Task.sleep(nanoseconds: 2_000_000)
-                waited += 1
-                if waited > 5_000 { throw NSError(domain: "TestClips", code: 1, userInfo: [NSLocalizedDescriptionKey: "writer stalled: \(String(describing: writer.error))"]) }
+        /// Appends tone up to `target` samples, but only while the writer accepts more (never blocks).
+        func pumpAudio(upTo target: Int) {
+            guard let audioInput else { return }
+            let goal = min(totalSamples, target)
+            while audioWritten < goal && audioInput.isReadyForMoreMediaData {
+                let count = min(2048, goal - audioWritten)
+                var samples = [Int16](repeating: 0, count: count)
+                for i in 0..<count {
+                    samples[i] = Int16(sin(2 * Double.pi * 440 * Double(audioWritten + i) / Double(rate)) * 9000)
+                }
+                if let sample = audioSampleBuffer(samples, rate: Double(rate), startFrame: Int64(audioWritten)) { audioInput.append(sample) }
+                audioWritten += count
             }
         }
 
         for index in 0..<frames {
-            try await waitReady(videoInput)
+            // The writer interleaves the two inputs, so keep feeding audio while waiting for the video input.
+            var waited = 0
+            while !videoInput.isReadyForMoreMediaData {
+                pumpAudio(upTo: Int(Double(index + fps) / Double(fps) * Double(rate)))
+                try await Task.sleep(nanoseconds: 2_000_000)
+                waited += 1
+                if waited > 5_000 { throw NSError(domain: "TestClips", code: 1, userInfo: [NSLocalizedDescriptionKey: "writer stalled: \(String(describing: writer.error))"]) }
+            }
             var buffer: CVPixelBuffer?
             CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
             if let pixels = buffer {
@@ -112,35 +125,18 @@ enum TestClips {
                 CVPixelBufferUnlockBaseAddress(pixels, [])
                 adaptor.append(pixels, withPresentationTime: CMTime(value: CMTimeValue(index), timescale: CMTimeScale(fps)))
             }
-            // Keep the audio level with the video: the writer interleaves, so one input cannot run far ahead of the other.
-            if let audioInput {
-                let target = min(totalSamples, Int(Double(index + 1) / Double(fps) * Double(rate)))
-                while audioWritten < target {
-                    try await waitReady(audioInput)
-                    let count = min(4096, target - audioWritten)
-                    var samples = [Int16](repeating: 0, count: count)
-                    for i in 0..<count {
-                        samples[i] = Int16(sin(2 * Double.pi * 440 * Double(audioWritten + i) / Double(rate)) * 9000)
-                    }
-                    if let sample = audioSampleBuffer(samples, rate: Double(rate), startFrame: Int64(audioWritten)) { audioInput.append(sample) }
-                    audioWritten += count
-                }
-            }
+            pumpAudio(upTo: Int(Double(index + 1) / Double(fps) * Double(rate)))
         }
         videoInput.markAsFinished()
-        if let audioInput {
-            while audioWritten < totalSamples {
-                try await waitReady(audioInput)
-                let count = min(4096, totalSamples - audioWritten)
-                var samples = [Int16](repeating: 0, count: count)
-                for i in 0..<count {
-                    samples[i] = Int16(sin(2 * Double.pi * 440 * Double(audioWritten + i) / Double(rate)) * 9000)
-                }
-                if let sample = audioSampleBuffer(samples, rate: Double(rate), startFrame: Int64(audioWritten)) { audioInput.append(sample) }
-                audioWritten += count
-            }
-            audioInput.markAsFinished()
+        // With the video finished the writer drains the audio on its own, so waiting here is safe.
+        var waited = 0
+        while audioWritten < totalSamples {
+            pumpAudio(upTo: totalSamples)
+            try await Task.sleep(nanoseconds: 2_000_000)
+            waited += 1
+            if waited > 5_000 { throw NSError(domain: "TestClips", code: 2, userInfo: [NSLocalizedDescriptionKey: "audio stalled: \(String(describing: writer.error))"]) }
         }
+        audioInput?.markAsFinished()
         await writer.finishWriting()
         XCTAssertEqual(writer.status, .completed, "Could not build the test clip: \(String(describing: writer.error))")
         return url

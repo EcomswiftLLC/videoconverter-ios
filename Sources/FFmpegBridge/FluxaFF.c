@@ -37,6 +37,7 @@ const char *fx_last_error(void) { return "FFmpeg is not included in this build."
 #else
 
 #include "libavutil/avutil.h"
+#include "libavutil/eval.h"
 #include "libavutil/opt.h"
 #include "libavutil/display.h"
 #include "libavutil/channel_layout.h"
@@ -795,7 +796,7 @@ int fx_execute(int argc, const char *const *argv, FxProgress progress, void *con
             if (ret < 0) break;
         }
         if (ret < 0) { fail(ret, "Finishing the conversion failed"); goto end; }
-        av_buffersrc_add_frame_flags(l->src, NULL, 0);
+        (void)av_buffersrc_add_frame_flags(l->src, NULL, 0);
         if ((ret = drain_sink(&J, l, filt)) < 0) { fail(ret, "Finishing the conversion failed"); goto end; }
         if ((ret = encode_frame(&J, l, NULL)) < 0) { fail(ret, "Finishing the conversion failed"); goto end; }
     }
