@@ -8,11 +8,11 @@ enum Samples {
         VideoStreamInfo(codecName: codec?.rawValue ?? name, codec: codec, width: width, height: height, fps: fps, bitrate: 4_000_000, rotation: rotation, isHDR: hdr)
     }
 
-    static func audio(_ codec: AudioCodec?, name: String = "x") -> AudioStreamInfo {
+    static func audio(_ codec: Fluxa.AudioCodec?, name: String = "x") -> AudioStreamInfo {
         AudioStreamInfo(codecName: codec?.rawValue ?? name, codec: codec, sampleRate: 44100, channels: 2, bitrate: 128_000)
     }
 
-    static func probe(video: VideoCodec?, audio: AudioCodec?, native: Bool, container: String = "mp4", duration: Double = 60, hdr: Bool = false, protected: Bool = false) -> MediaProbe {
+    static func probe(video: VideoCodec?, audio: Fluxa.AudioCodec?, native: Bool, container: String = "mp4", duration: Double = 60, hdr: Bool = false, protected: Bool = false) -> MediaProbe {
         MediaProbe(
             containerName: container, duration: duration, fileSize: 50_000_000, bitrate: 4_500_000,
             video: video == nil ? nil : Samples.video(video, hdr: hdr),
