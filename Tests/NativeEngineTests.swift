@@ -93,7 +93,9 @@ final class NativeEngineTests: XCTestCase {
         let (out, plan) = try await convert(clip, spec)
         XCTAssertEqual(plan.kind, .transcode)
         let info = try await inspect(out)
-        XCTAssertEqual(info.videoSize, CGSize(width: 854, height: 480))
+        // 16:9 at 480 lines: the encoder may round the width to a multiple of 4 (852 or 854).
+        XCTAssertEqual(info.videoSize?.height ?? 0, 480, accuracy: 0.5)
+        XCTAssertEqual(info.videoSize?.width ?? 0, 854, accuracy: 4)
         XCTAssertEqual(info.videoCodec, "avc1")
         XCTAssertTrue(info.hasAudio)
         XCTAssertEqual(info.duration, 3, accuracy: 0.4)
