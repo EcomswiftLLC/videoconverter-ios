@@ -24,6 +24,11 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Fetch the LGPL FFmpeg build (when pinned)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/ffmpeg/fetch_ffmpeg.py
+
       - name: Generate project
         run: xcodegen generate
 

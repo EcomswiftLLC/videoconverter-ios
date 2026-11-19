@@ -29,6 +29,10 @@ jobs:
           sudo xcode-select -s "$XC"
           xcodebuild -version
       - run: brew install xcodegen
+      - name: Fetch the LGPL FFmpeg build (when pinned)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/ffmpeg/fetch_ffmpeg.py
       - run: xcodegen generate
       - name: Unit tests
         run: |
@@ -77,6 +81,10 @@ jobs:
           XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
           sudo xcode-select -s "$XC"
       - run: brew install xcodegen
+      - name: Fetch the LGPL FFmpeg build (when pinned)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/ffmpeg/fetch_ffmpeg.py
       - run: xcodegen generate
       - name: Build for simulator
         run: |
@@ -148,6 +156,10 @@ jobs:
           XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
           sudo xcode-select -s "$XC"
       - run: brew install xcodegen
+      - name: Fetch the LGPL FFmpeg build (when pinned)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/ffmpeg/fetch_ffmpeg.py
       - run: xcodegen generate
       - name: Build for simulator
         run: |
@@ -218,6 +230,10 @@ jobs:
           XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
           sudo xcode-select -s "$XC"
       - run: brew install xcodegen
+      - name: Fetch the LGPL FFmpeg build (when pinned)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/ffmpeg/fetch_ffmpeg.py
       - run: xcodegen generate
       - name: UI tests on iPad (landscape screens and first-run flow)
         run: |
@@ -277,6 +293,10 @@ jobs:
           XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
           sudo xcode-select -s "$XC"
       - run: brew install xcodegen
+      - name: Fetch the LGPL FFmpeg build (when pinned)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/ffmpeg/fetch_ffmpeg.py
       - run: xcodegen generate
       - name: UI tests on iPhone (landscape screens and first-run flow)
         run: |
