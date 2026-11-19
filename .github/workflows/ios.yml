@@ -1,0 +1,317 @@
+name: iOS build, test and screenshots
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # Every screen the debug build can open directly with `-fxScreen <name>` (see Sources/App/DebugScreens.swift).
+  SCREENS: "onboarding home settings setup formats-grid presets advanced queue result audio-extract gif-maker formats-guide"
+
+  # The store captures (`-fxScreen shot-<name>`, see Sources/App/StoreScreens.swift): real bundled photos and clips, real views.
+  # They are saved under exactly these names in the store-iphone and store-ipad artifacts.
+  STORE_SHOTS: "home setup formats-grid presets advanced queue result audio-extract gif-maker formats-guide"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-test:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: Unit tests
+        run: |
+          set -o pipefail
+          mkdir -p build
+          DEST=$(xcrun simctl list devices available | grep -E "iPhone 1[5-9]" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/')
+          echo "Simulator: $DEST"
+          xcodebuild test -project Fluxa.xcodeproj -scheme Fluxa -destination "id=$DEST" -only-testing:FluxaTests CODE_SIGNING_ALLOWED=NO | tee build/test.log | grep -E "error:|warning: unre|Test Suite|Executed|BUILD|TEST " | tail -n 80
+      - name: Compiler errors (if any)
+        if: failure()
+        run: grep -E "error:" build/test.log | sort -u | head -80 || true
+      - name: Collect crash evidence
+        if: failure()
+        run: |
+          mkdir -p crash
+          ls -la ~/Library/Logs/DiagnosticReports > crash/listing.txt 2>&1 || true
+          cp ~/Library/Logs/DiagnosticReports/Fluxa* crash/ 2>/dev/null || true
+          cp ~/Library/Logs/DiagnosticReports/*.crash crash/ 2>/dev/null || true
+          cp ~/Library/Logs/DiagnosticReports/*.ips crash/ 2>/dev/null || true
+          xcrun simctl spawn booted log show --last 10m --predicate 'process == "Fluxa"' > crash/simulator-log.txt 2>&1 || true
+          ls crash
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: crash-reports-unit
+          path: crash
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-logs
+          path: |
+            build/*.log
+            build/engine-frames
+          if-no-files-found: ignore
+
+  screenshots:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: Build for simulator
+        run: |
+          set -o pipefail
+          mkdir -p build
+          DEST=$(xcrun simctl list devices available | grep -E "iPhone 1[6-9] Pro Max" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/')
+          if [ -z "$DEST" ]; then DEST=$(xcrun simctl list devices available | grep -E "iPhone 1[5-9]" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/'); fi
+          echo "iPhone simulator: $DEST"
+          echo "$DEST" > build/dest.txt
+          xcodebuild build -project Fluxa.xcodeproj -scheme Fluxa -configuration Debug -destination "id=$DEST" -derivedDataPath build/dd CODE_SIGNING_ALLOWED=NO | tee build/shots-build.log | grep -E "error:|BUILD" | tail -n 40
+      - name: Take screenshots
+        run: |
+          DEST=$(cat build/dest.txt)
+          xcrun simctl boot "$DEST" || true
+          xcrun simctl bootstatus "$DEST" -b || true
+          xcrun simctl ui "$DEST" appearance dark || true
+          APP=$(find build/dd -name Fluxa.app -maxdepth 6 | head -1)
+          xcrun simctl install "$DEST" "$APP"
+          mkdir -p shots
+          for SCREEN in $SCREENS; do
+            xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
+            xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxScreen "$SCREEN" || true
+            sleep 10
+            xcrun simctl io "$DEST" screenshot "shots/$SCREEN.png" || true
+          done
+          ls shots
+      - name: Take store captures
+        run: |
+          DEST=$(cat build/dest.txt)
+          # A clean status bar (9:41, full battery and signal), as on the store listing.
+          xcrun simctl status_bar "$DEST" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4 || true
+          mkdir -p store
+          for SHOT in $STORE_SHOTS; do
+            xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
+            xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxNoAds YES -fxScreen "shot-$SHOT" || true
+            sleep 16
+            xcrun simctl io "$DEST" screenshot "store/$SHOT.png" || true
+          done
+          xcrun simctl status_bar "$DEST" clear || true
+          ls store
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: store-iphone
+          path: store
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: shots
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-logs-shots
+          path: build/*.log
+          if-no-files-found: ignore
+
+  screenshots-ipad:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: Build for simulator
+        run: |
+          set -o pipefail
+          mkdir -p build
+          DEST=$(xcrun simctl list devices available | grep -E "iPad Pro 13-inch" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/')
+          if [ -z "$DEST" ]; then DEST=$(xcrun simctl list devices available | grep -E "iPad.*13-inch" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/'); fi
+          echo "iPad simulator: $DEST"
+          echo "$DEST" > build/dest.txt
+          xcodebuild build -project Fluxa.xcodeproj -scheme Fluxa -configuration Debug -destination "id=$DEST" -derivedDataPath build/dd CODE_SIGNING_ALLOWED=NO | tee build/shots-build.log | grep -E "error:|BUILD" | tail -n 40
+      - name: Take screenshots
+        run: |
+          DEST=$(cat build/dest.txt)
+          xcrun simctl boot "$DEST" || true
+          xcrun simctl bootstatus "$DEST" -b || true
+          xcrun simctl ui "$DEST" appearance dark || true
+          APP=$(find build/dd -name Fluxa.app -maxdepth 6 | head -1)
+          xcrun simctl install "$DEST" "$APP"
+          mkdir -p shots
+          for SCREEN in $SCREENS; do
+            xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
+            xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxScreen "$SCREEN" || true
+            sleep 10
+            xcrun simctl io "$DEST" screenshot "shots/$SCREEN.png" || true
+          done
+          ls shots
+      - name: Take store captures
+        run: |
+          DEST=$(cat build/dest.txt)
+          xcrun simctl status_bar "$DEST" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 || true
+          mkdir -p store
+          for SHOT in $STORE_SHOTS; do
+            xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
+            xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxNoAds YES -fxScreen "shot-$SHOT" || true
+            sleep 16
+            xcrun simctl io "$DEST" screenshot "store/$SHOT.png" || true
+          done
+          xcrun simctl status_bar "$DEST" clear || true
+          ls store
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: store-ipad
+          path: store
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-ipad
+          path: shots
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-logs-shots-ipad
+          path: build/*.log
+          if-no-files-found: ignore
+
+  ipad-landscape:
+    runs-on: macos-26
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: UI tests on iPad (landscape screens and first-run flow)
+        run: |
+          set -o pipefail
+          mkdir -p build
+          DEST=$(xcrun simctl list devices available | grep -E "iPad Pro 13-inch" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/')
+          if [ -z "$DEST" ]; then DEST=$(xcrun simctl list devices available | grep -E "iPad.*13-inch" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/'); fi
+          echo "iPad simulator: $DEST"
+          xcrun simctl boot "$DEST" || true
+          xcrun simctl bootstatus "$DEST" -b || true
+          rm -rf build/ui.xcresult
+          xcodebuild test -project Fluxa.xcodeproj -scheme Fluxa -destination "id=$DEST" -only-testing:FluxaUITests -resultBundlePath build/ui.xcresult CODE_SIGNING_ALLOWED=NO | tee build/ui-test.log | grep -E "error:|Test Case|Executed|TEST " | tail -n 80
+      - name: Export screenshots
+        if: always()
+        run: |
+          mkdir -p shots-landscape
+          xcrun xcresulttool export attachments --path build/ui.xcresult --output-path shots-landscape || true
+          ls shots-landscape | head -50
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-ipad-landscape
+          path: shots-landscape
+          if-no-files-found: ignore
+      - name: Collect crash evidence
+        if: failure()
+        run: |
+          mkdir -p crash
+          ls -la ~/Library/Logs/DiagnosticReports > crash/listing.txt 2>&1 || true
+          cp ~/Library/Logs/DiagnosticReports/Fluxa* crash/ 2>/dev/null || true
+          cp ~/Library/Logs/DiagnosticReports/*.ips crash/ 2>/dev/null || true
+          xcrun simctl spawn booted log show --last 15m --predicate 'process == "Fluxa"' > crash/simulator-log.txt 2>&1 || true
+          xcrun xcresulttool get test-results summary --path build/ui.xcresult > crash/xcresult-summary.json 2>&1 || true
+          ls crash
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: crash-reports-ipad
+          path: crash
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-test-logs
+          path: build/ui-test.log
+          if-no-files-found: ignore
+
+  iphone-landscape:
+    runs-on: macos-26
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: UI tests on iPhone (landscape screens and first-run flow)
+        run: |
+          set -o pipefail
+          mkdir -p build
+          DEST=$(xcrun simctl list devices available | grep -E "iPhone 1[6-9] Pro Max" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/')
+          if [ -z "$DEST" ]; then DEST=$(xcrun simctl list devices available | grep -E "iPhone 1[5-9]" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/'); fi
+          echo "iPhone simulator: $DEST"
+          xcrun simctl boot "$DEST" || true
+          xcrun simctl bootstatus "$DEST" -b || true
+          rm -rf build/ui-iphone.xcresult
+          xcodebuild test -project Fluxa.xcodeproj -scheme Fluxa -destination "id=$DEST" -only-testing:FluxaUITests -resultBundlePath build/ui-iphone.xcresult CODE_SIGNING_ALLOWED=NO | tee build/ui-test-iphone.log | grep -E "error:|Test Case|Executed|TEST " | tail -n 80
+      - name: Export screenshots
+        if: always()
+        run: |
+          mkdir -p shots-landscape-iphone
+          xcrun xcresulttool export attachments --path build/ui-iphone.xcresult --output-path shots-landscape-iphone || true
+          ls shots-landscape-iphone | head -50
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-iphone-landscape
+          path: shots-landscape-iphone
+          if-no-files-found: ignore
+      - name: Collect crash evidence
+        if: failure()
+        run: |
+          mkdir -p crash
+          ls -la ~/Library/Logs/DiagnosticReports > crash/listing.txt 2>&1 || true
+          cp ~/Library/Logs/DiagnosticReports/Fluxa* crash/ 2>/dev/null || true
+          cp ~/Library/Logs/DiagnosticReports/*.ips crash/ 2>/dev/null || true
+          xcrun simctl spawn booted log show --last 15m --predicate 'process == "Fluxa"' > crash/simulator-log.txt 2>&1 || true
+          xcrun xcresulttool get test-results summary --path build/ui-iphone.xcresult > crash/xcresult-summary.json 2>&1 || true
+          ls crash
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: crash-reports-iphone
+          path: crash
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-test-logs-iphone
+          path: build/ui-test-iphone.log
+          if-no-files-found: ignore

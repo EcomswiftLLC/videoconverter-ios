@@ -1,0 +1,4 @@
+// Google's public test IDs. Safe for development, NEVER ship these in a release.
+ADMOB_APP_ID = ca-app-pub-3940256099942544~1458002511
+ADMOB_BANNER_UNIT_ID = ca-app-pub-3940256099942544/2435281174
+ADMOB_REWARDED_UNIT_ID = ca-app-pub-3940256099942544/1712485313

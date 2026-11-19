@@ -1,0 +1,12 @@
+.DS_Store
+*.xcodeproj
+xcuserdata/
+DerivedData/
+build/
+*.ipa
+*.p8
+*.p12
+*.mobileprovision
+.swiftpm/
+Package.resolved
+design/_scratch/
