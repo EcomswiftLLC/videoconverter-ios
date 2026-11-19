@@ -107,7 +107,7 @@ jobs:
           for SCREEN in $SCREENS; do
             xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
             xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxScreen "$SCREEN" || true
-            sleep 10
+            if [ "$SCREEN" = result ]; then sleep 70; else sleep 10; fi
             xcrun simctl io "$DEST" screenshot "shots/$SCREEN.png" || true
           done
           ls shots
@@ -120,7 +120,7 @@ jobs:
           for SHOT in $STORE_SHOTS; do
             xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
             xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxNoAds YES -fxScreen "shot-$SHOT" || true
-            sleep 16
+            if [ "$SHOT" = result ]; then sleep 70; else sleep 16; fi
             xcrun simctl io "$DEST" screenshot "store/$SHOT.png" || true
           done
           xcrun simctl status_bar "$DEST" clear || true
@@ -182,7 +182,7 @@ jobs:
           for SCREEN in $SCREENS; do
             xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
             xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxScreen "$SCREEN" || true
-            sleep 10
+            if [ "$SCREEN" = result ]; then sleep 70; else sleep 10; fi
             xcrun simctl io "$DEST" screenshot "shots/$SCREEN.png" || true
           done
           ls shots
@@ -194,7 +194,7 @@ jobs:
           for SHOT in $STORE_SHOTS; do
             xcrun simctl terminate "$DEST" com.ecomswift.fluxa || true
             xcrun simctl launch "$DEST" com.ecomswift.fluxa -fxNoAds YES -fxScreen "shot-$SHOT" || true
-            sleep 16
+            if [ "$SHOT" = result ]; then sleep 70; else sleep 16; fi
             xcrun simctl io "$DEST" screenshot "store/$SHOT.png" || true
           done
           xcrun simctl status_bar "$DEST" clear || true

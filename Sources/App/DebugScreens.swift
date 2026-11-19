@@ -99,7 +99,15 @@ private struct DebugHost: View {
             }
             queue.debugSetRunning(true)
         }
-        if name == "result" { queue.start() }
+        if name == "result" {
+            queue.start()
+            // Show the finished result, not the progress: wait for the real conversion to end.
+            var running = 0.0
+            while queue.isRunning && running < 150 {
+                try? await Task.sleep(nanoseconds: 250_000_000)
+                running += 0.25
+            }
+        }
         ready = true
     }
 }
