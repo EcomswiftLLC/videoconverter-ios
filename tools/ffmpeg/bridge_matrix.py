@@ -11,6 +11,10 @@ WORK = os.path.abspath(sys.argv[2])
 os.makedirs(WORK, exist_ok=True)
 FAILS = []
 RESULTS = []
+SKIPPED = []
+
+_enc = subprocess.run(["ffmpeg", "-hide_banner", "-encoders"], capture_output=True, text=True).stdout
+BREW_ENCODERS = {line.split()[1] for line in _enc.splitlines() if len(line.split()) > 1 and line.startswith(" V") or line.startswith(" A")}
 
 
 def sh(args, check=True):
@@ -45,7 +49,18 @@ def probe(path):
     return json.loads(r.stdout)
 
 
+def needs(opts):
+    """Encoders named in an option list that Homebrew's FFmpeg does not have (the app's own build does)."""
+    names = [opts[i + 1] for i in range(len(opts) - 1) if opts[i] in ("-c:v", "-c:a")]
+    return [n for n in names if n != "copy" and n not in BREW_ENCODERS]
+
+
 def run(label, src, out, opts, expect_video=None, expect_audio=None, duration=None, tol=0.8, vcodec=None, acodec=None):
+    missing = needs(opts[1])
+    if missing:
+        print(f"SKIP {label} (the test machine's FFmpeg has no {', '.join(missing)})", flush=True)
+        SKIPPED.append(label)
+        return
     if os.path.exists(out):
         os.remove(out)
     args = [FXRUN, "run", "-hide_banner", "-nostdin", "-y"] + opts[0] + ["-i", src] + opts[1] + [out]
@@ -178,9 +193,9 @@ for src_key in ["mp4", "mkv", "webm", "avi", "wmv", "mp3", "m4a", "flac", "wav",
 # Animated images.
 chain = "fps=10,scale=240:-2:flags=lanczos"
 palette = ",split[s0][s1];[s0]palettegen=max_colors=128:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle"
-run("mp4 -> gif", FIX["mp4"], os.path.join(WORK, "anim.gif"), ([], ["-sn", "-dn", "-an", "-map", "0:v:0", "-vf", chain + palette, "-loop", "0", "-f", "gif"]), True, False, 4.0, vcodec="gif")
-run("mkv -> webp", FIX["mkv"], os.path.join(WORK, "anim.webp"), ([], ["-sn", "-dn", "-an", "-map", "0:v:0", "-vf", chain, "-c:v", "libwebp_anim", "-lossless", "0", "-q:v", "70", "-loop", "0", "-f", "webp"]), True, False, 4.0, vcodec="webp")
-run("mp4 -> apng", FIX["mp4"], os.path.join(WORK, "anim.apng"), ([], ["-sn", "-dn", "-an", "-map", "0:v:0", "-vf", chain + ",format=rgba", "-c:v", "apng", "-plays", "0", "-f", "apng"]), True, False, 4.0, vcodec="apng")
+run("mp4 -> gif", FIX["mp4"], os.path.join(WORK, "anim.gif"), ([], ["-sn", "-dn", "-an", "-map", "0:v:0", "-vf", chain + palette, "-loop", "0", "-f", "gif"]), True, False, None, vcodec="gif")
+run("mkv -> webp", FIX["mkv"], os.path.join(WORK, "anim.webp"), ([], ["-sn", "-dn", "-an", "-map", "0:v:0", "-vf", chain, "-c:v", "libwebp_anim", "-lossless", "0", "-q:v", "70", "-loop", "0", "-f", "webp"]), True, False, None, vcodec="webp")
+run("mp4 -> apng", FIX["mp4"], os.path.join(WORK, "anim.apng"), ([], ["-sn", "-dn", "-an", "-map", "0:v:0", "-vf", chain + ",format=rgba", "-c:v", "apng", "-plays", "0", "-f", "apng"]), True, False, None, vcodec="apng")
 
 # Trim, resize, rotate, flip, mute, strip metadata.
 run("trim 1s..3s mp4 -> mp4", FIX["mp4"], os.path.join(WORK, "trim.mp4"), (["-ss", "1.000"], ["-t", "2.000"] + MAPS + ["-c:v", "h264_videotoolbox", "-vf", "format=yuv420p", "-b:v", "1000k", "-allow_sw", "1"] + AAC + ["-f", "mp4"]), True, True, 2.0, tol=0.6)

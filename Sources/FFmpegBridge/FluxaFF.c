@@ -416,6 +416,13 @@ static int decode_packet(Job *j, Lane *l, AVPacket *pkt, AVFrame *frame, AVFrame
 // MARK: Copy
 
 static int finish_copy_packet(Job *j, Lane *l, AVPacket *pkt) {
+    // Some sources (MPEG program streams) carry packets with no timestamps; the muxers need them.
+    if (pkt->dts == AV_NOPTS_VALUE && pkt->pts != AV_NOPTS_VALUE) pkt->dts = pkt->pts;
+    if (pkt->pts == AV_NOPTS_VALUE && pkt->dts != AV_NOPTS_VALUE) pkt->pts = pkt->dts;
+    if (pkt->dts == AV_NOPTS_VALUE) {
+        if (l->last_dts == AV_NOPTS_VALUE || pkt->duration <= 0) return 0; // nothing to anchor it to: skip
+        pkt->dts = pkt->pts = l->last_dts + pkt->duration;
+    }
     if (pkt->dts != AV_NOPTS_VALUE && l->last_dts != AV_NOPTS_VALUE && pkt->dts <= l->last_dts) {
         pkt->dts = l->last_dts + 1;
         if (pkt->pts != AV_NOPTS_VALUE && pkt->pts < pkt->dts) pkt->pts = pkt->dts;
@@ -732,6 +739,11 @@ int fx_execute(int argc, const char *const *argv, FxProgress progress, void *con
         AVRational guess = av_guess_frame_rate(J.ifmt, J.v.in, NULL);
         if (guess.num > 0 && guess.den > 0) fps = guess;
         if (av_q2d(fps) > 120) fps = (AVRational){60, 1};
+        if (!J.o.vcodec[0]) {
+            // No codec named (GIF output): the muxer's own default.
+            const AVCodec *def = avcodec_find_encoder(J.ofmt->oformat->video_codec);
+            if (def) snprintf(J.o.vcodec, sizeof(J.o.vcodec), "%s", def->name);
+        }
         if (J.v.copy) {
             if ((ret = add_copy_stream(&J, &J.v)) < 0) { fail(ret, "Cannot copy the video"); goto end; }
         } else {
@@ -742,6 +754,10 @@ int fx_execute(int argc, const char *const *argv, FxProgress progress, void *con
     }
     // Audio lane.
     if (J.has_a) {
+        if (!J.o.acodec[0]) {
+            const AVCodec *def = avcodec_find_encoder(J.ofmt->oformat->audio_codec);
+            if (def) snprintf(J.o.acodec, sizeof(J.o.acodec), "%s", def->name);
+        }
         if (J.a.copy) {
             if ((ret = add_copy_stream(&J, &J.a)) < 0) { fail(ret, "Cannot copy the audio"); goto end; }
         } else {

@@ -80,6 +80,19 @@ jobs:
             esac
           done
 
+      - name: Check the ad code paths are in the Release binary
+        run: |
+          # The banner and the rewarded gate must ship in the Release build, and the ad SDKs must be embedded.
+          FXP=build/Fluxa.xcarchive/Products/Applications/Fluxa.app
+          BIN="$FXP/Fluxa"
+          for NEEDLE in GADBannerView GADRewardedAd RewardedGate UMPConsentInformation; do
+            COUNT=$(strings -a "$BIN" "$FXP"/Frameworks/*.framework/* 2>/dev/null | grep -c "$NEEDLE" || true)
+            echo "$NEEDLE: $COUNT"
+            if [ "$COUNT" -eq 0 ]; then echo "Missing $NEEDLE in the Release build" && exit 1; fi
+          done
+          # And the debug-only screen launcher must not be shipped.
+          if strings -a "$BIN" | grep -q "fxScreen"; then echo "Debug screen launcher found in the Release build" && exit 1; fi
+
       - name: Create distribution certificate and profile (short-lived)
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}

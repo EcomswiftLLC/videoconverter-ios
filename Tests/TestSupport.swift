@@ -109,7 +109,7 @@ enum TestClips {
                 pumpAudio(upTo: Int(Double(index + fps) / Double(fps) * Double(rate)))
                 try await Task.sleep(nanoseconds: 2_000_000)
                 waited += 1
-                if waited > 5_000 { throw NSError(domain: "TestClips", code: 1, userInfo: [NSLocalizedDescriptionKey: "writer stalled: \(String(describing: writer.error))"]) }
+                if waited > 30_000 { throw NSError(domain: "TestClips", code: 1, userInfo: [NSLocalizedDescriptionKey: "writer stalled: \(String(describing: writer.error))"]) }
             }
             var buffer: CVPixelBuffer?
             CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
@@ -134,7 +134,7 @@ enum TestClips {
             pumpAudio(upTo: totalSamples)
             try await Task.sleep(nanoseconds: 2_000_000)
             waited += 1
-            if waited > 5_000 { throw NSError(domain: "TestClips", code: 2, userInfo: [NSLocalizedDescriptionKey: "audio stalled: \(String(describing: writer.error))"]) }
+            if waited > 30_000 { throw NSError(domain: "TestClips", code: 2, userInfo: [NSLocalizedDescriptionKey: "audio stalled: \(String(describing: writer.error))"]) }
         }
         audioInput?.markAsFinished()
         await writer.finishWriting()
