@@ -36,7 +36,7 @@ jobs:
           mkdir -p build
           DEST=$(xcrun simctl list devices available | grep -E "iPhone 1[5-9]" | head -1 | sed -E 's/^ *(.*) \(([0-9A-F-]{36})\).*/\2/')
           echo "Simulator: $DEST"
-          xcodebuild test -project Fluxa.xcodeproj -scheme Fluxa -destination "id=$DEST" -only-testing:FluxaTests CODE_SIGNING_ALLOWED=NO | tee build/test.log | grep -E "error:|warning: unre|Test Suite|Executed|BUILD|TEST " | tail -n 80
+          xcodebuild test -project Fluxa.xcodeproj -scheme Fluxa -destination "id=$DEST" -only-testing:FluxaTests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO | tee build/test.log | grep -E "error:|warning: unre|Test Suite|Executed|BUILD|TEST " | tail -n 80
       - name: Compiler errors (if any)
         if: failure()
         run: grep -E "error:" build/test.log | sort -u | head -80 || true

@@ -83,37 +83,61 @@ enum TestClips {
         writer.startSession(atSourceTime: .zero)
 
         let frames = Int(seconds * Double(fps))
+        let rate = 44100
+        let totalSamples = Int(seconds * Double(rate))
+        var audioWritten = 0
+
+        func waitReady(_ input: AVAssetWriterInput) async throws {
+            var waited = 0
+            while !input.isReadyForMoreMediaData {
+                try await Task.sleep(nanoseconds: 2_000_000)
+                waited += 1
+                if waited > 5_000 { throw NSError(domain: "TestClips", code: 1, userInfo: [NSLocalizedDescriptionKey: "writer stalled: \(String(describing: writer.error))"]) }
+            }
+        }
+
         for index in 0..<frames {
-            while !videoInput.isReadyForMoreMediaData { try await Task.sleep(nanoseconds: 2_000_000) }
+            try await waitReady(videoInput)
             var buffer: CVPixelBuffer?
             CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
-            guard let pixels = buffer else { continue }
-            CVPixelBufferLockBaseAddress(pixels, [])
-            if let context = CGContext(data: CVPixelBufferGetBaseAddress(pixels), width: width, height: height, bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(pixels), space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue) {
-                context.setFillColor(CGColor(red: 0.05, green: 0.1, blue: 0.2, alpha: 1))
-                context.fill(CGRect(x: 0, y: 0, width: width, height: height))
-                context.setFillColor(CGColor(red: 0.5, green: 0.9, blue: 0.8, alpha: 1))
-                let x = CGFloat(index % max(width - 80, 1))
-                context.fill(CGRect(x: x, y: CGFloat(height) / 2 - 40, width: 80, height: 80))
+            if let pixels = buffer {
+                CVPixelBufferLockBaseAddress(pixels, [])
+                if let context = CGContext(data: CVPixelBufferGetBaseAddress(pixels), width: width, height: height, bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(pixels), space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue) {
+                    context.setFillColor(CGColor(red: 0.05, green: 0.1, blue: 0.2, alpha: 1))
+                    context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+                    context.setFillColor(CGColor(red: 0.5, green: 0.9, blue: 0.8, alpha: 1))
+                    let x = CGFloat(index % max(width - 80, 1))
+                    context.fill(CGRect(x: x, y: CGFloat(height) / 2 - 40, width: 80, height: 80))
+                }
+                CVPixelBufferUnlockBaseAddress(pixels, [])
+                adaptor.append(pixels, withPresentationTime: CMTime(value: CMTimeValue(index), timescale: CMTimeScale(fps)))
             }
-            CVPixelBufferUnlockBaseAddress(pixels, [])
-            adaptor.append(pixels, withPresentationTime: CMTime(value: CMTimeValue(index), timescale: CMTimeScale(fps)))
+            // Keep the audio level with the video: the writer interleaves, so one input cannot run far ahead of the other.
+            if let audioInput {
+                let target = min(totalSamples, Int(Double(index + 1) / Double(fps) * Double(rate)))
+                while audioWritten < target {
+                    try await waitReady(audioInput)
+                    let count = min(4096, target - audioWritten)
+                    var samples = [Int16](repeating: 0, count: count)
+                    for i in 0..<count {
+                        samples[i] = Int16(sin(2 * Double.pi * 440 * Double(audioWritten + i) / Double(rate)) * 9000)
+                    }
+                    if let sample = audioSampleBuffer(samples, rate: Double(rate), startFrame: Int64(audioWritten)) { audioInput.append(sample) }
+                    audioWritten += count
+                }
+            }
         }
         videoInput.markAsFinished()
-
         if let audioInput {
-            let rate = 44100
-            let total = Int(seconds * Double(rate))
-            var written = 0
-            while written < total {
-                while !audioInput.isReadyForMoreMediaData { try await Task.sleep(nanoseconds: 2_000_000) }
-                let count = min(4096, total - written)
+            while audioWritten < totalSamples {
+                try await waitReady(audioInput)
+                let count = min(4096, totalSamples - audioWritten)
                 var samples = [Int16](repeating: 0, count: count)
                 for i in 0..<count {
-                    samples[i] = Int16(sin(2 * Double.pi * 440 * Double(written + i) / Double(rate)) * 9000)
+                    samples[i] = Int16(sin(2 * Double.pi * 440 * Double(audioWritten + i) / Double(rate)) * 9000)
                 }
-                if let sample = audioSampleBuffer(samples, rate: Double(rate), startFrame: Int64(written)) { audioInput.append(sample) }
-                written += count
+                if let sample = audioSampleBuffer(samples, rate: Double(rate), startFrame: Int64(audioWritten)) { audioInput.append(sample) }
+                audioWritten += count
             }
             audioInput.markAsFinished()
         }
