@@ -323,3 +323,30 @@ jobs:
           name: ui-test-logs-iphone
           path: build/ui-test-iphone.log
           if-no-files-found: ignore
+
+  ffmpeg-bridge:
+    # Runs Fluxa's FFmpeg wrapper (FluxaFF.c) through every format on a Mac with Homebrew's FFmpeg and checks each output.
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install ffmpeg pkgconf
+      - name: Build the runner
+        run: |
+          set -o pipefail
+          mkdir -p build/ffmpeg
+          clang -std=gnu11 -O1 -Wall -Wextra -Wno-unused-parameter -Wno-deprecated-declarations \
+            -ISources/FFmpegBridge $(pkg-config --cflags libavformat libavcodec libavfilter libavutil) \
+            tools/ffmpeg/fxrun.c Sources/FFmpegBridge/FluxaFF.c \
+            $(pkg-config --libs libavformat libavcodec libavfilter libavutil) -o build/ffmpeg/fxrun 2>&1 | tee build/ffmpeg/compile.log
+          ls -la build/ffmpeg/fxrun
+      - name: Convert every source into every target
+        run: |
+          set -o pipefail
+          python3 tools/ffmpeg/bridge_matrix.py build/ffmpeg/fxrun build/ffmpeg/work 2>&1 | tee build/ffmpeg/matrix.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ffmpeg-bridge-logs
+          path: build/ffmpeg/*.log
+          if-no-files-found: ignore

@@ -102,10 +102,7 @@ final class FFmpegEngine: TranscodeEngine {
 /// Finds the FFmpeg bridge of this build. Returns nil when the FFmpeg library is not linked.
 enum FFmpegBridgeProvider {
     static func makeBridge() -> FFmpegBridge? {
-        #if canImport(FFmpegLGPL)
+        // nil when the FFmpeg libraries were not linked into this build.
         return LGPLBridge()
-        #else
-        return nil
-        #endif
     }
 }

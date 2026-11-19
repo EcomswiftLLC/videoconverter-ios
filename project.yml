@@ -49,6 +49,7 @@ targets:
         SUPPORTS_MACCATALYST: NO
         SWIFT_STRICT_CONCURRENCY: minimal
         TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/FFmpegBridge/Fluxa-Bridging-Header.h
   FluxaTests:
     type: bundle.unit-test
     platform: iOS
