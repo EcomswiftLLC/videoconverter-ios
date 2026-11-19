@@ -12,10 +12,13 @@ final class LandscapeUITests: XCTestCase {
     }
 
     private func capture(_ screen: String, orientation: UIDeviceOrientation, settle: TimeInterval = 8) {
-        XCUIDevice.shared.orientation = orientation
+        XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
         app.launchArguments = ["-fxNoAds", "YES", "-fxScreen", screen, "-fx.hasOnboarded", "YES"]
         app.launch()
+        Thread.sleep(forTimeInterval: 3)
+        // Rotate after launch: a screenshot of an app launched straight into landscape comes out cropped and sideways on the simulator.
+        XCUIDevice.shared.orientation = orientation
         Thread.sleep(forTimeInterval: settle)
         XCTAssertTrue(app.windows.firstMatch.exists, "\(screen) has a window")
         let shot = XCTAttachment(screenshot: app.screenshot())
@@ -27,13 +30,13 @@ final class LandscapeUITests: XCTestCase {
 
     func testScreensInLandscape() {
         for screen in ["onboarding", "home", "setup-mp4", "formats-grid", "presets", "advanced", "queue", "result", "gif-maker", "formats-guide", "settings"] {
-            capture(screen, orientation: .landscapeLeft)
+            capture(screen, orientation: .landscapeLeft, settle: screen == "result" ? 70 : 8)
         }
     }
 
     func testKeyScreensInPortrait() {
         for screen in ["home", "setup-mp4", "result"] {
-            capture(screen, orientation: .portrait)
+            capture(screen, orientation: .portrait, settle: screen == "result" ? 70 : 8)
         }
     }
 }

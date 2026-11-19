@@ -275,6 +275,7 @@ private struct ResultCard: View {
             Text(runningText).font(FX.Font.caption).foregroundStyle(FX.Palette.mist)
         case .done:
             VStack(alignment: .leading, spacing: 2) {
+                Text(summaryText).font(FX.Font.caption).foregroundStyle(FX.Palette.paper)
                 Text(sizeText).font(FX.Font.caption).foregroundStyle(FX.Palette.mist)
                 if let plan = item.plan {
                     Label(plan.badge, systemImage: plan.kind == .remux ? "bolt.fill" : "checkmark.seal")
@@ -325,6 +326,17 @@ private struct ResultCard: View {
             return "\(percent)% · about \(Fmt.duration(remaining)) left"
         }
         return "\(percent)%"
+    }
+
+    /// What the person gets, shown before any save or share (and so before the rewarded ad): format, length and size.
+    private var summaryText: String {
+        var parts = [queue.spec.format.displayName]
+        if let probe = item.probe {
+            let seconds = BitrateEstimator.effectiveDuration(probe: probe, spec: queue.spec)
+            if seconds > 0 { parts.append(Fmt.duration(seconds)) }
+        }
+        parts.append(Fmt.bytes(item.resultBytes))
+        return parts.joined(separator: " · ")
     }
 
     private var sizeText: String {

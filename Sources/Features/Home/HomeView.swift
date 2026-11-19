@@ -27,7 +27,7 @@ struct HomeView: View {
         ("Video to MP3", "Extract the audio", .mp3, "waveform"),
         ("Video to GIF", "Looping, shareable", .gif, "photo.on.rectangle.angled"),
         ("MOV to MP4", "Works everywhere", .mp4, "play.rectangle"),
-        ("WebM to MP4", "Open on iPhone", .mp4, "globe"),
+        ("WebM to MP4", "Plays on iPhone and iPad", .mp4, "globe"),
         ("Any to AVI", "For Windows PCs", .avi, "pc")
     ]
 
