@@ -168,7 +168,7 @@ struct ConvertView: View {
                         .accessibilityIdentifier("savePhotos")
                     }
                 }
-                Text("Saving or sharing is paid for by one short ad. If no ad is ready, it's free.")
+                Text("Saving or sharing plays one short ad. If none is ready, it's free.")
                     .font(FX.Font.caption).foregroundStyle(FX.Palette.mist)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
