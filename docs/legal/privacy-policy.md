@@ -27,7 +27,7 @@ All conversion happens on your device: reading the file, changing the container 
 
 Converted files are written to the app's own storage on your device until you save or share them. Fluxa never overwrites or deletes your original file. When you save or share a result, Fluxa hands the file to your photo library, the Files app or the iOS share sheet. Where it goes after that is your choice, and we do not receive it.
 
-Your settings (for example your last chosen format and presets) and a short list of recent conversions are stored only on your device.
+A small setting that remembers you have seen the welcome screen is stored only on your device.
 
 ## 3. Information we receive
 
@@ -66,8 +66,8 @@ A rewarded video is shown only if you choose to watch it ("Watch a short ad to e
 
 ## 7. Deleting your data
 
-- Fluxa has no account. Deleting the app removes everything the app stores, including converted files you have not saved and your recent list.
-- Inside the app you can clear the recent list and remove converted files you no longer need.
+- Fluxa has no account. Deleting the app removes everything the app stores, including converted files you have not saved.
+- Inside the app, Settings has a "Clear temporary files" button that removes converted files you no longer need.
 - Videos you saved to your photo library, and files you exported or shared, are outside the app. You manage and delete them where you saved or sent them.
 - Your device backup (for example iCloud Backup or a computer backup) may contain a copy of the app's data according to your Apple settings. That copy is controlled by you and Apple, not by us.
 - We hold no personal data about you from your use of the app, so there is nothing on our side to delete. For advertising data held by Google, use Google's controls (https://myadcenter.google.com) or contact Google.

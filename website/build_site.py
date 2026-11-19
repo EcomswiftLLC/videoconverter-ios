@@ -214,7 +214,7 @@ FAQ = [
     ("What happens if I do not allow tracking?",
      "<p>The app works the same and the ads are less personalised. You can change the choice any time in iOS Settings under Privacy and Security, then Tracking. Fluxa runs no analytics of its own.</p>"),
     ("Which devices does it run on?",
-     "<p>iPhone and iPad with iOS 17 or iPadOS 17 or later, in portrait and landscape. Saving as HEVC uses the hardware encoder, which some older devices do not have; Fluxa then offers H.264.</p>"),
+     "<p>iPhone and iPad with iOS 17 or iPadOS 17 or later, in portrait and landscape. Saving as HEVC uses the hardware encoder, which some older devices do not have; choose H.264 instead.</p>"),
     ("When can I download it?",
      "<p>Fluxa is not on the App Store yet, so there is no download link. This page will link to the App Store listing once the app is available.</p>"),
     ("Who makes Fluxa?",
@@ -279,7 +279,7 @@ def specimen_html(root=""):
 
 
 SHOT_ALTS = [
-    "Fluxa on iPhone: the Home screen with recent conversions",
+    "Fluxa on iPhone: the Home screen with popular conversions and sample clips",
     "Fluxa on iPhone: choosing MP4 as the target format",
     "Fluxa on iPhone: the format grid grouped into video, audio and animated image",
     "Fluxa on iPhone: presets for devices and players",
