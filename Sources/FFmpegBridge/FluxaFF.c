@@ -295,6 +295,7 @@ typedef struct {
     AVBSFContext *bsf;
     int64_t offset;       // start of the file (plus trim) in this stream's input time base
     int64_t last_dts;
+    int64_t last_out_dts; // last decode time stamp handed to the muxer, in the output time base
     int done;
     int sample_rate;      // audio filter time base
 } Lane;
@@ -330,6 +331,16 @@ static double packet_seconds(const AVPacket *pkt, const AVStream *ost) {
 
 static int write_packet(Job *j, Lane *l, AVPacket *pkt) {
     pkt->stream_index = l->out->index;
+    // Muxers refuse time stamps that do not strictly increase. Re-timed audio and program streams can repeat or
+    // step back by a few ticks, so nudge those packets forward (the ffmpeg command-line tool does the same).
+    if (pkt->dts == AV_NOPTS_VALUE && pkt->pts != AV_NOPTS_VALUE) pkt->dts = pkt->pts;
+    if (pkt->dts != AV_NOPTS_VALUE) {
+        if (l->last_out_dts != AV_NOPTS_VALUE && pkt->dts <= l->last_out_dts) {
+            pkt->dts = l->last_out_dts + 1;
+            if (pkt->pts != AV_NOPTS_VALUE && pkt->pts < pkt->dts) pkt->pts = pkt->dts;
+        }
+        l->last_out_dts = pkt->dts;
+    }
     double t = packet_seconds(pkt, l->out);
     int ret = av_interleaved_write_frame(j->ofmt, pkt);
     if (ret >= 0 && t >= 0) report(j, t);
@@ -645,11 +656,20 @@ static int open_audio_encoder(Job *j) {
 static int add_copy_stream(Job *j, Lane *l) {
     AVCodecParameters *source = l->in->codecpar;
     // AAC from ADTS (MPEG-TS, .aac) needs its headers rewritten before MP4 or MKV can hold it.
-    if (source->codec_id == AV_CODEC_ID_AAC && source->extradata_size == 0) {
-        const AVBitStreamFilter *f = av_bsf_get_by_name("aac_adtstoasc");
+    // H.264 and HEVC from MP4, MOV or MKV are length-prefixed; AVI, MPEG-TS and MPEG-PS want start codes instead.
+    const char *bsf_name = NULL;
+    if (source->codec_id == AV_CODEC_ID_AAC && source->extradata_size == 0) bsf_name = "aac_adtstoasc";
+    else if (l->is_video && source->extradata_size > 0 && source->extradata[0] == 1) {
+        const char *fmt = j->ofmt->oformat->name;
+        int wants_annexb = !strcmp(fmt, "avi") || !strcmp(fmt, "mpegts") || !strcmp(fmt, "mpeg");
+        if (wants_annexb && source->codec_id == AV_CODEC_ID_H264) bsf_name = "h264_mp4toannexb";
+        else if (wants_annexb && source->codec_id == AV_CODEC_ID_HEVC) bsf_name = "hevc_mp4toannexb";
+    }
+    if (bsf_name) {
+        const AVBitStreamFilter *f = av_bsf_get_by_name(bsf_name);
         if (f && av_bsf_alloc(f, &l->bsf) >= 0) {
             avcodec_parameters_copy(l->bsf->par_in, source);
-            l->bsf->time_base_in = l->out ? l->out->time_base : l->in->time_base;
+            l->bsf->time_base_in = l->in->time_base;
             if (av_bsf_init(l->bsf) < 0) av_bsf_free(&l->bsf);
         }
     }
@@ -686,6 +706,7 @@ int fx_execute(int argc, const char *const *argv, FxProgress progress, void *con
     J.t0 = av_gettime_relative();
     J.v.is_video = 1;
     J.v.last_dts = J.a.last_dts = AV_NOPTS_VALUE;
+    J.v.last_out_dts = J.a.last_out_dts = AV_NOPTS_VALUE;
 
     AVPacket *pkt = av_packet_alloc();
     AVFrame *frame = av_frame_alloc();
