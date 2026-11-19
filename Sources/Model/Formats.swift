@@ -232,7 +232,7 @@ enum OutputFormat: String, CaseIterable, Codable, Hashable, Identifiable {
     var videoCodecs: [VideoCodec] {
         let all = allVideoCodecs
         // Theora is only offered when the linked FFmpeg can encode it (the same switch that hides OGV).
-        return OutputFormat.unavailable.contains(.ogv) ? all.filter { $0 != .theora } : all
+        return self != .ogv && OutputFormat.unavailable.contains(.ogv) ? all.filter { $0 != .theora } : all
     }
 
     private var allVideoCodecs: [VideoCodec] {
