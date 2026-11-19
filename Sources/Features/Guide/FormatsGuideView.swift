@@ -85,7 +85,7 @@ struct FormatsGuideView: View {
     private func formatCard(_ format: OutputFormat) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
-                Text(format.displayName).font(.system(size: 20, weight: .semibold, design: .rounded)).foregroundStyle(FX.Palette.paper)
+                Text(format.displayName).font(FX.Font.tile).foregroundStyle(FX.Palette.paper)
                 Text(".\(format.fileExtension)").font(FX.Font.caption).foregroundStyle(FX.Palette.mist)
                 Spacer()
             }

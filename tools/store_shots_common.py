@@ -49,9 +49,13 @@ BRAND_SLIDE = "home-filled"
 FIT_SLIDES = {"result"}
 
 
+# The app's own typefaces (Instrument Serif and Manrope), so the store slides match the app.
+FONT_DIR = Path(__file__).resolve().parent.parent / "Sources" / "Resources" / "Fonts"
+
+
 def font(names, size):
     for n in names:
-        for base in ("C:/Windows/Fonts/", "/usr/share/fonts/truetype/dejavu/", "/System/Library/Fonts/Supplemental/"):
+        for base in (str(FONT_DIR) + "/", "C:/Windows/Fonts/", "/usr/share/fonts/truetype/dejavu/", "/System/Library/Fonts/Supplemental/"):
             p = Path(base) / n
             if p.exists():
                 return ImageFont.truetype(str(p), size)
@@ -59,11 +63,11 @@ def font(names, size):
 
 
 def serif(size):
-    return font(["georgia.ttf", "DejaVuSerif.ttf"], size)
+    return font(["InstrumentSerif-Regular.ttf", "georgia.ttf", "DejaVuSerif.ttf"], int(size * 1.1))
 
 
 def sans(size):
-    return font(["segoeui.ttf", "DejaVuSans.ttf"], size)
+    return font(["Manrope-Medium.ttf", "segoeui.ttf", "DejaVuSans.ttf"], size)
 
 
 def background(W, H):

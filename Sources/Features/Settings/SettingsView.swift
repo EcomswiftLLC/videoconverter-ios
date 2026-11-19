@@ -123,6 +123,7 @@ struct LicensesView: View {
         ("LAME (MP3)", "LGPL v2. https://lame.sourceforge.io"),
         ("libwebp", "BSD 3-clause. https://chromium.googlesource.com/webm/libwebp"),
         ("dav1d (AV1 decoding)", "BSD 2-clause. https://code.videolan.org/videolan/dav1d"),
+        ("Manrope and Instrument Serif (typefaces)", "SIL Open Font License 1.1. The Manrope Project Authors, https://github.com/googlefonts/manrope. The Instrument Serif Project Authors, https://github.com/Instrument/instrument-serif"),
         ("Google Mobile Ads and User Messaging Platform SDKs", "Google terms. https://developers.google.com/admob")
     ]
 

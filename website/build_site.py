@@ -507,6 +507,7 @@ LIBS = [
     ("libtheora (Theora)", "BSD 3-Clause", "https://www.theora.org/"),
     ("libwebp (WebP)", "BSD 3-Clause", "https://chromium.googlesource.com/webm/libwebp/"),
     ("dav1d (AV1 decoding)", "BSD 2-Clause", "https://code.videolan.org/videolan/dav1d"),
+    ("Manrope and Instrument Serif (typefaces)", "SIL Open Font License 1.1", "https://openfontlicense.org/"),
     ("Google Mobile Ads SDK and User Messaging Platform", "Google's terms", "https://developers.google.com/admob/terms"),
 ]
 

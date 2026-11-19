@@ -1,6 +1,9 @@
-/* Fluxa site. System fonts only, no external requests. Dark by design, like the app.
+/* Fluxa site. Self-hosted fonts (Instrument Serif and Manrope, SIL OFL), no external requests. Dark by design, like the app.
    Layout: one calm reading column per section, section titles in a left rail on wide screens.
    Memorable element: the hero specimen, a real file turning into another format along an aurora line. */
+@font-face { font-family: "Instrument Serif"; src: url("fonts/InstrumentSerif-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Instrument Serif"; src: url("fonts/InstrumentSerif-Italic.ttf") format("truetype"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Manrope"; src: url("fonts/Manrope-Variable.ttf") format("truetype"); font-weight: 200 800; font-style: normal; font-display: swap; }
 :root {
   --ink: #080B12;        /* page */
   --surface: #0F1422;    /* bands, footer */
@@ -13,8 +16,8 @@
   --violet: #9C8CFF;     /* decorative only */
   --on-accent: #04110F;
   --danger: #F2998F;
-  --serif: "New York", ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Charter, Georgia, serif;
-  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Instrument Serif", "New York", ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Charter, Georgia, serif;
+  --sans: "Manrope", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --gutter: max(1rem, env(safe-area-inset-left, 0px));
   --gutter-r: max(1rem, env(safe-area-inset-right, 0px));
   --measure: 40rem;
@@ -48,7 +51,7 @@ a:hover { text-decoration-thickness: 2px; }
 /* header */
 .site-header { padding-block: .9rem; border-bottom: 1px solid var(--hairline); }
 .site-header .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .3rem 2rem; }
-.brand { display: inline-flex; align-items: center; gap: .55rem; min-height: 44px; text-decoration: none; color: var(--text); font-family: var(--serif); font-size: 1.5rem; font-weight: 500; letter-spacing: .005em; }
+.brand { display: inline-flex; align-items: center; gap: .55rem; min-height: 44px; text-decoration: none; color: var(--text); font-family: var(--serif); font-size: 1.7rem; font-weight: 400; letter-spacing: .005em; }
 .brand img { width: 36px; height: 36px; }
 .nav { display: flex; flex-wrap: wrap; gap: 0 1.4rem; font-size: .95rem; }
 .nav a { color: var(--text); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
@@ -56,7 +59,7 @@ a:hover { text-decoration-thickness: 2px; }
 .nav a[aria-current="page"] { color: var(--mint); font-weight: 600; }
 
 /* type */
-h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.1; letter-spacing: -.012em; margin: 0; text-wrap: balance; color: var(--text); }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.1; letter-spacing: -.012em; margin: 0; text-wrap: balance; color: var(--text); }
 h1 { font-size: clamp(2.5rem, 5.6vw, 4.3rem); letter-spacing: -.022em; }
 h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
 h3 { font-size: 1.2rem; letter-spacing: -.004em; }

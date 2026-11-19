@@ -34,7 +34,7 @@ struct FormatTile: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(format.displayName)
-                    .font(.system(.title3, design: .rounded).weight(.semibold))
+                    .font(FX.Font.tile)
                     .foregroundStyle(selected ? FX.Palette.onGlow : FX.Palette.paper)
                 Text(format.summary)
                     .font(FX.Font.caption)
