@@ -50,7 +50,7 @@ final class FFmpegIntegrationTests: XCTestCase {
 
     func testLibraryReportsTheExpectedEncoders() {
         let caps = bridge.capabilities
-        for name in ["h264_videotoolbox", "libvpx-vp9", "libopus", "libvorbis", "libmp3lame", "aac", "flac", "mpeg4", "gif"] {
+        for name in ["h264_videotoolbox", "libvpx-vp9", "libopus", "libvorbis", "libmp3lame", "aac", "flac", "mpeg4", "gif", "libtheora"] {
             XCTAssertTrue(caps.encoders.contains(name), "missing encoder \(name)")
         }
     }
