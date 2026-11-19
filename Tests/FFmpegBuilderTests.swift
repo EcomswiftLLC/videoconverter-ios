@@ -232,6 +232,6 @@ final class FFmpegBuilderTests: XCTestCase {
     func testFailureMapping() {
         XCTAssertEqual(FFmpegEngine.mapFailure("No space left on device"), .diskFull)
         XCTAssertEqual(FFmpegEngine.mapFailure("moov atom not found"), .unreadable("the file looks damaged or incomplete"))
-        XCTAssertEqual(FFmpegEngine.mapFailure("something odd"), .engineFailed(""))
+        XCTAssertEqual(FFmpegEngine.mapFailure("something odd"), .engineFailed("something odd"))
     }
 }

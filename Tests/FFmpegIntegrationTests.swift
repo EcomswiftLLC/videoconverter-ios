@@ -29,6 +29,19 @@ final class FFmpegIntegrationTests: XCTestCase {
         return (output, result)
     }
 
+    /// Like `convert`, but a failure is recorded with the format and the library's message and the loop carries on,
+    /// so one run shows every format that fails.
+    private func convertOrReport(_ source: URL, _ spec: OutputSpec, _ label: String) async -> (URL, MediaProbe)? {
+        do {
+            return try await convert(source, spec)
+        } catch let error as ConversionError {
+            XCTFail("\(label): \(error.title) - \(error.message)")
+        } catch {
+            XCTFail("\(label): \(error)")
+        }
+        return nil
+    }
+
     private func sourceClip() async throws -> URL {
         try await TestClips.makeMP4(seconds: 3, width: 640, height: 360)
     }
@@ -57,7 +70,7 @@ final class FFmpegIntegrationTests: XCTestCase {
     func testEveryVideoFormatCanBeWrittenAndReadBack() async throws {
         let clip = try await sourceClip()
         for format in OutputFormat.formats(in: .video) {
-            let (_, result) = try await convert(clip, OutputSpec(format: format))
+            guard let (_, result) = await convertOrReport(clip, OutputSpec(format: format), "to \(format.displayName)") else { continue }
             XCTAssertTrue(result.hasVideo, "\(format.displayName) has video")
             XCTAssertTrue(result.hasAudio, "\(format.displayName) has audio")
             XCTAssertEqual(result.duration, 3, accuracy: 0.8, "\(format.displayName) duration")
@@ -93,9 +106,9 @@ final class FFmpegIntegrationTests: XCTestCase {
         let clip = try await sourceClip()
         let hop: [OutputFormat] = [.mkv, .webm, .avi, .flv, .wmv, .mpg, .ts]
         for first in hop {
-            let (middle, _) = try await convert(clip, OutputSpec(format: first))
+            guard let (middle, _) = await convertOrReport(clip, OutputSpec(format: first), "mp4 -> \(first.displayName)") else { continue }
             for second in [OutputFormat.mp4, .mkv, .mp3, .wav] where second != first {
-                let (_, result) = try await convert(middle, OutputSpec(format: second))
+                guard let (_, result) = await convertOrReport(middle, OutputSpec(format: second), "\(first.displayName) -> \(second.displayName)") else { continue }
                 XCTAssertGreaterThan(result.duration, 1.5, "\(first.displayName) -> \(second.displayName)")
             }
         }

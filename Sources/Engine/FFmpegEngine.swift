@@ -95,7 +95,7 @@ final class FFmpegEngine: TranscodeEngine {
         if text.contains("encrypted") || text.contains("drm") || text.contains("protected") { return .drmProtected }
         if text.contains("permission denied") { return .unreadable("no permission to read the file") }
         if text.contains("encoder") && text.contains("not found") { return .needsAdvancedEngine }
-        return .engineFailed("")
+        return .engineFailed(line.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 }
 
