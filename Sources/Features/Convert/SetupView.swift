@@ -155,7 +155,7 @@ struct FileRowView: View {
                 }
                 .foregroundStyle(FX.Palette.glow)
                 if item.probe?.nativeReadable == false && item.probe?.isAudioOnly == false {
-                    Text("This file won't play in Photos or Files on iPhone.")
+                    Text("This file won't play in Photos or Files on \(UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone").")
                         .font(FX.Font.caption).foregroundStyle(FX.Palette.mist)
                 }
                 ForEach(plan.notes, id: \.self) { note in

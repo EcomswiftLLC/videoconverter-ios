@@ -233,7 +233,7 @@ private struct ResultCard: View {
     @EnvironmentObject private var queue: ConversionQueue
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FX.Space.m) {
+        VStack(alignment: .leading, spacing: FX.Space.s) {
             HStack(alignment: .top, spacing: FX.Space.m) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous).fill(FX.Palette.graphite)
