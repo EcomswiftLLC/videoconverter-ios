@@ -52,14 +52,13 @@ FORMATS_OUT = {
         ("MOV", "Apple's format. Best for editing on a Mac.", "H.264, HEVC, ProRes 422, Motion JPEG, MPEG-4", "AAC, Apple Lossless, PCM, MP3"),
         ("M4V", "MP4 for Apple TV and Apple's media apps.", "H.264, HEVC, MPEG-4, VP9", "AAC, MP3, AC-3, Apple Lossless"),
         ("3GP", "Tiny files for old phones and MMS.", "H.264, MPEG-4, H.263", "AAC, AMR"),
-        ("MKV", "Holds any codec, many audio tracks and subtitles.", "H.264, HEVC, VP9, VP8, MPEG-4, Theora", "AAC, Opus, Vorbis, MP3, FLAC, AC-3, PCM"),
+        ("MKV", "Holds any codec, many audio tracks and subtitles.", "H.264, HEVC, VP9, VP8, MPEG-4", "AAC, Opus, Vorbis, MP3, FLAC, AC-3, PCM"),
         ("WebM", "Open web video for browsers and Android.", "VP9, VP8", "Opus, Vorbis"),
         ("AVI", "Classic Windows video, old players.", "MPEG-4, H.264, Motion JPEG, WMV 8", "MP3, AAC, AC-3, PCM"),
         ("FLV", "Flash video for legacy sites and tools.", "H.264, Sorenson H.263", "AAC, MP3"),
         ("WMV", "Windows Media for older PCs and Office.", "WMV 8, MPEG-4", "WMA"),
         ("MPG", "MPEG-2 for DVD players and old TVs.", "MPEG-2, MPEG-4", "AC-3, MP3"),
         ("MPEG-TS", "Broadcast streams, AVCHD and IPTV.", "H.264, HEVC, MPEG-2", "AAC, AC-3, MP3"),
-        ("OGV", "Open Theora video for Linux players.", "Theora", "Vorbis, Opus"),
     ],
     "Audio": [
         ("M4A", "AAC audio. Great quality in small files.", "", "AAC, Apple Lossless"),
@@ -203,7 +202,7 @@ FAQ = [
     ("Why is MKV to MP4 so fast sometimes?",
      "<p>Many MKV files already hold H.264 or HEVC video and AAC audio, which MP4 can hold too. Then Fluxa only moves the streams into the new container instead of re-encoding them. It takes seconds and the picture and sound are exactly the same.</p>"),
     ("Which formats can it open and save?",
-     "<p>It opens MKV, AVI, WebM, WMV, FLV, MOV, MP4, MTS, VOB and many more, and saves 12 video formats, 9 audio formats and 3 animated image formats. The <a href=\"formats/\">formats page</a> has the full list with codecs.</p>"),
+     "<p>It opens MKV, AVI, WebM, WMV, FLV, MOV, MP4, MTS, VOB and many more, and saves 11 video formats, 9 audio formats and 3 animated image formats. The <a href=\"formats/\">formats page</a> has the full list with codecs.</p>"),
     ("Why can't it convert a film I bought?",
      "<p>Films and shows bought or rented from a store, or downloaded from a streaming service, are protected by DRM. Fluxa cannot read protected or encrypted files, and it tells you so instead of failing quietly.</p>"),
     ("Why am I asked to watch an ad?",
@@ -239,7 +238,7 @@ def jsonld_app():
                                   "addressLocality": "Sheridan", "addressRegion": "WY", "postalCode": "82801",
                                   "addressCountry": "US"}},
         "featureList": [
-            "Convert between 12 video, 9 audio and 3 animated image formats",
+            "Convert between 11 video, 9 audio and 3 animated image formats",
             "Lossless re-wrap when the codecs already fit",
             "Presets for iPhone, Android, web, Windows, DVD players and editing",
             "Extract audio as MP3, M4A, WAV, FLAC and more",
@@ -443,7 +442,7 @@ def build_index():
 # ----------------------------------------------------------------------------- formats
 def build_formats():
     title = f"Supported formats | {SITE_NAME}"
-    desc = ("Every format Fluxa opens and saves: 12 video, 9 audio and 3 animated image output formats with their codecs, "
+    desc = ("Every format Fluxa opens and saves: 11 video, 9 audio and 3 animated image output formats with their codecs, "
             "the input formats it reads, and the honest limits (DRM, encrypted files, rare codecs).")
     tables = []
     for cat, rows in FORMATS_OUT.items():

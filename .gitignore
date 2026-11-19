@@ -10,3 +10,5 @@ build/
 .swiftpm/
 Package.resolved
 design/_scratch/
+__pycache__/
+design/store/

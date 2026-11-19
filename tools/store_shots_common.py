@@ -31,7 +31,7 @@ GLOW = MINT                # halo and hairline around the capture
 # Sources/Model/Formats.swift). Re-check against the shipped build before upload. Order = order on the App Store.
 SLIDES = [
     ("setup-mp4", ["Any format", "to MP4."], "MKV, AVI, WebM, MOV and dozens more."),
-    ("formats-grid", ["MKV, AVI, WebM,", "MOV and more."], "12 video, 9 audio and 3 animated formats."),
+    ("formats-grid", ["MKV, AVI, WebM,", "MOV and more."], "11 video, 9 audio and 3 animated formats."),
     ("audio-extract", ["Extract audio", "as MP3."], "Or M4A, WAV, FLAC, OGG and Opus."),
     ("gif-maker", ["Turn clips", "into GIFs."], "Palette-optimised GIF, WebP and APNG."),
     ("queue", ["Batch convert", "in one go."], "Progress for every file in the queue."),

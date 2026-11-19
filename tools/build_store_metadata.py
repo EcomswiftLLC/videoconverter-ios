@@ -128,7 +128,7 @@ Honest wording: no star or review claims, no competitor names, no "AI", no claim
 ```
 
 Facts behind the wording, written 2026-11-19 from `VideoApps-Spec/SPEC.md` and `Sources/Model/Formats.swift` while the app was still being built. RE-VERIFY against the shipped build before submitting and edit the copy if anything was cut:
-- Output formats = `OutputFormat` (12 video, 9 audio, 3 animated image). Input lists = `InputFormats.groups` plus SPEC (AV1/VP8/VP9 decode, DivX/XviD, RM/RMVB).
+- Output formats = `OutputFormat` (11 video, 9 audio, 3 animated image). Input lists = `InputFormats.groups` plus SPEC (AV1/VP8/VP9 decode, DivX/XviD, RM/RMVB).
 - Video codecs listed = `VideoCodec` minus H.263 (only offered for 3GP). Audio codecs per container = `OutputFormat.audioCodecs`.
 - The 10 presets (SPEC "Presets"), resolutions 4K/1440/1080/720/480/360/custom, fps, quality/bitrate, trim, rotate/flip, metadata keep/strip, HDR to SDR (SPEC "Advanced"): confirm each exists in the Convert screen.
 - Remux "re-wraps in seconds, no loss" = the engine chooser's remux path. Batch queue with per-file progress. iPad drag and drop.

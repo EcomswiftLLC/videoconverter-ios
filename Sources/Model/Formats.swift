@@ -230,6 +230,12 @@ enum OutputFormat: String, CaseIterable, Codable, Hashable, Identifiable {
 
     /// Video codecs the container can hold, best first. The first one is the default.
     var videoCodecs: [VideoCodec] {
+        let all = allVideoCodecs
+        // Theora is only offered when the linked FFmpeg can encode it (the same switch that hides OGV).
+        return OutputFormat.unavailable.contains(.ogv) ? all.filter { $0 != .theora } : all
+    }
+
+    private var allVideoCodecs: [VideoCodec] {
         switch self {
         case .mp4, .m4v: return [.h264, .hevc, .mpeg4, .vp9]
         case .mov: return [.h264, .hevc, .prores, .mjpeg, .mpeg4]

@@ -54,7 +54,7 @@ PRESETS FOR EVERY DEVICE
 Universal MP4, iPhone and iPad, Android, Web (WebM), Windows (WMV or AVI), Old TV and DVD player (MPG), Editing (ProRes MOV), GIF, Audio only, and Fix a video that will not play (re-made as H.264 and AAC in MP4).
 
 FULL CONTROL WHEN YOU WANT IT
-- Video codec: H.264 and HEVC with hardware encoding, VP9, VP8, MPEG-4, MPEG-2, WMV, Motion JPEG, ProRes and Theora, depending on the format
+- Video codec: H.264 and HEVC with hardware encoding, VP9, VP8, MPEG-4, MPEG-2, WMV, Motion JPEG and ProRes, depending on the format
 - Resolution from 4K down to 360p or a custom size, frame rate, quality or bitrate
 - Audio codec, bitrate and sample rate
 - Trim, rotate and flip, keep or remove metadata, and convert HDR to standard colour
@@ -73,7 +73,7 @@ Video: MP4, MOV, M4V, 3GP, 3G2, MKV, WebM, AVI (DivX and XviD), WMV, ASF, FLV, F
 Audio: MP3, AAC, M4A, WAV, AIFF, CAF, FLAC, OGG, Opus, WMA, AMR, AC3 and EAC3.
 
 WHAT IT WRITES
-Video: MP4, MOV, M4V, 3GP, MKV, WebM, AVI, FLV, WMV, MPG, MPEG-TS and OGV.
+Video: MP4, MOV, M4V, 3GP, MKV, WebM, AVI, FLV, WMV, MPG and MPEG-TS.
 Audio: M4A, MP3, WAV, AIFF, CAF, FLAC, OGG, Opus and AC3.
 Animated image: GIF, animated WebP and APNG.
 
@@ -90,7 +90,7 @@ Questions or ideas? Write to support@ecomswiftllc.com.
 ```
 
 Facts behind the wording, written 2026-11-19 from `VideoApps-Spec/SPEC.md` and `Sources/Model/Formats.swift` while the app was still being built. RE-VERIFY against the shipped build before submitting and edit the copy if anything was cut:
-- Output formats = `OutputFormat` (12 video, 9 audio, 3 animated image). Input lists = `InputFormats.groups` plus SPEC (AV1/VP8/VP9 decode, DivX/XviD, RM/RMVB).
+- Output formats = `OutputFormat` (11 video, 9 audio, 3 animated image). Input lists = `InputFormats.groups` plus SPEC (AV1/VP8/VP9 decode, DivX/XviD, RM/RMVB).
 - Video codecs listed = `VideoCodec` minus H.263 (only offered for 3GP). Audio codecs per container = `OutputFormat.audioCodecs`.
 - The 10 presets (SPEC "Presets"), resolutions 4K/1440/1080/720/480/360/custom, fps, quality/bitrate, trim, rotate/flip, metadata keep/strip, HDR to SDR (SPEC "Advanced"): confirm each exists in the Convert screen.
 - Remux "re-wraps in seconds, no loss" = the engine chooser's remux path. Batch queue with per-file progress. iPad drag and drop.
