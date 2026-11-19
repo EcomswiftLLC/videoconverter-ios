@@ -26,13 +26,13 @@ final class LandscapeUITests: XCTestCase {
     }
 
     func testScreensInLandscape() {
-        for screen in ["onboarding", "home", "setup", "formats-grid", "presets", "advanced", "queue", "result", "gif-maker", "formats-guide", "settings"] {
+        for screen in ["onboarding", "home", "setup-mp4", "formats-grid", "presets", "advanced", "queue", "result", "gif-maker", "formats-guide", "settings"] {
             capture(screen, orientation: .landscapeLeft)
         }
     }
 
     func testKeyScreensInPortrait() {
-        for screen in ["home", "setup", "result"] {
+        for screen in ["home", "setup-mp4", "result"] {
             capture(screen, orientation: .portrait)
         }
     }

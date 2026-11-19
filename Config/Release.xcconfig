@@ -1,5 +1,5 @@
-// Production AdMob ids for "Photo Animator & Cinemagraph: Fluxa" (iOS), created 2026-11-18 in the Ecom Swift AdMob account.
+// Production AdMob ids for "Video Converter MP4 MKV: Fluxa" (iOS), created 2026-11-19 in the Ecom Swift AdMob account.
 // Debug.xcconfig keeps Google's public test ids.
-ADMOB_APP_ID = ca-app-pub-8621573128492952~9505075957
-ADMOB_BANNER_UNIT_ID = ca-app-pub-8621573128492952/7461045749
-ADMOB_REWARDED_UNIT_ID = ca-app-pub-8621573128492952/9971659014
+ADMOB_APP_ID = ca-app-pub-8621573128492952~9759161163
+ADMOB_BANNER_UNIT_ID = ca-app-pub-8621573128492952/5390551644
+ADMOB_REWARDED_UNIT_ID = ca-app-pub-8621573128492952/6076560319

@@ -7,11 +7,11 @@ on:
 
 env:
   # Every screen the debug build can open directly with `-fxScreen <name>` (see Sources/App/DebugScreens.swift).
-  SCREENS: "onboarding home settings setup formats-grid presets advanced queue result audio-extract gif-maker formats-guide"
+  SCREENS: "onboarding home home-filled settings setup-mp4 formats-grid presets advanced queue result audio-extract gif-maker formats-guide"
 
   # The store captures (`-fxScreen shot-<name>`, see Sources/App/StoreScreens.swift): real bundled photos and clips, real views.
   # They are saved under exactly these names in the store-iphone and store-ipad artifacts.
-  STORE_SHOTS: "home setup formats-grid presets advanced queue result audio-extract gif-maker formats-guide"
+  STORE_SHOTS: "setup-mp4 formats-grid audio-extract gif-maker queue presets advanced result formats-guide home-filled"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -66,6 +66,8 @@ jobs:
           if-no-files-found: ignore
 
   screenshots:
+    # Pushes run the unit tests only; start this workflow by hand for screenshots and UI tests.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-26
     timeout-minutes: 60
     steps:
@@ -135,6 +137,8 @@ jobs:
           if-no-files-found: ignore
 
   screenshots-ipad:
+    # Pushes run the unit tests only; start this workflow by hand for screenshots and UI tests.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-26
     timeout-minutes: 60
     steps:
@@ -203,6 +207,8 @@ jobs:
           if-no-files-found: ignore
 
   ipad-landscape:
+    # Pushes run the unit tests only; start this workflow by hand for screenshots and UI tests.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-26
     timeout-minutes: 75
     steps:
@@ -260,6 +266,8 @@ jobs:
           if-no-files-found: ignore
 
   iphone-landscape:
+    # Pushes run the unit tests only; start this workflow by hand for screenshots and UI tests.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-26
     timeout-minutes: 75
     steps:

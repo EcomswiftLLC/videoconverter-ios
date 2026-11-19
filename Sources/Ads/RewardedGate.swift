@@ -153,7 +153,7 @@ final class RewardedGate: NSObject, FullScreenContentDelegate {
     private func presentOffer(from presenter: UIViewController, action: @escaping () -> Void) {
         let alert = UIAlertController(
             title: "Watch a short ad to export",
-            message: "Fluxa is free because of ads. Watch one ad to the end to save or share your animation.",
+            message: "Fluxa is free because of ads. Watch one ad to the end to save or share your converted file.",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Not now", style: .cancel))

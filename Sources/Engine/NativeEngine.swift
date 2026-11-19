@@ -120,7 +120,7 @@ final class NativeEngine: TranscodeEngine {
         case .mp4: return .mp4
         case .mov: return .mov
         case .m4v: return .m4v
-        case .threeGP: return .mobile3GP
+        case .threeGP: return .mobile3GPP
         case .m4a: return .m4a
         case .wav: return .wav
         case .aiff: return .aiff

@@ -32,7 +32,7 @@ private struct DebugHost: View {
 
     var body: some View {
         Group {
-            if name == "home" {
+            if name == "home" || name == "home-filled" {
                 HomeView()
             } else if ready {
                 NavigationStack { screen }
@@ -44,7 +44,7 @@ private struct DebugHost: View {
                 }
             }
         }
-        .task { if name != "home" { await prepare() } }
+        .task { if name != "home" && name != "home-filled" { await prepare() } }
     }
 
     @ViewBuilder
