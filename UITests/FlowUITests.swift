@@ -53,8 +53,11 @@ final class FlowUITests: XCTestCase {
         let sample = app.buttons["sample-waterfall"]
         XCTAssertTrue(sample.waitForExistence(timeout: 20))
         sample.tap()
+        let audioChip = app.buttons["Audio"]
+        XCTAssertTrue(audioChip.waitForExistence(timeout: 30), "the Audio category chip")
+        audioChip.tap()
         let m4a = app.buttons["format-m4a"]
-        XCTAssertTrue(m4a.waitForExistence(timeout: 30))
+        XCTAssertTrue(m4a.waitForExistence(timeout: 10), "the M4A tile after choosing Audio")
         if !m4a.isHittable { app.swipeUp() }
         m4a.tap()
         let convert = app.buttons["convertButton"]
